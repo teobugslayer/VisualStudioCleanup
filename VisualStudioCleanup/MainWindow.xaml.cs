@@ -23,6 +23,8 @@ namespace VisualStudioCleanup
         public MainWindow()
         {
             InitializeComponent();
+
+            this.DataContext = new UiController();
         }
     }
 }
