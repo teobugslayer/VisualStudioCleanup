@@ -5,7 +5,6 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Win32;
 using System.Reactive.Disposables;
@@ -14,23 +13,21 @@ namespace VisualStudioCleanup
 {
     static class OperatingSystemTasks
     {
-        public static Task TurnOffHyperV()
+        public static IObservable<Unit> TurnOffHyperV()
         {
-            var result = new Task(() =>
+            return Observable.Start(() =>
             {
                 using (var dism = Process.Start("dism.exe", "/Online /Disable-Feature:Microsoft-Hyper-V-All"))
                 {
                     dism.WaitForExit();
                 }
             },
-            TaskCreationOptions.LongRunning);
-            result.Start();
-            return result;
+            RxApp.TaskpoolScheduler);
         }
 
-        public static Task CleanSetupLogs()
+        public static IObservable<Unit> CleanSetupLogs()
         {
-            var result = new Task(() =>
+            return Observable.Start(() =>
             {
                 var tempDir = Path.GetTempPath();
                 Directory.EnumerateFiles(tempDir, "dd_*.*").ToObservable().Subscribe(file => File.Delete(file));
@@ -38,23 +35,19 @@ namespace VisualStudioCleanup
                 Directory.EnumerateFiles(tempDir, "MSI*.LOG").ToObservable().Subscribe(file => File.Delete(file));
                 Directory.EnumerateFiles(tempDir, "sql*.*").ToObservable().Subscribe(file => File.Delete(file));
             },
-            TaskCreationOptions.LongRunning);
-            result.Start();
-            return result;
+            RxApp.TaskpoolScheduler);
         }
 
-        public static Task Uninstall(string program)
+        public static IObservable<Unit> Uninstall(string program)
         {
-            var result = new Task(() =>
+            return Observable.Start(() =>
             {
                 using (var proc = Process.Start("cmd.exe", "/c " + program))
                 {
                     proc.WaitForExit();
                 }
             },
-            TaskCreationOptions.LongRunning);
-            result.Start();
-            return result;
+            RxApp.TaskpoolScheduler);
         }
 
         public static IObservable<Uninstallable> GetUninstallables()

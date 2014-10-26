@@ -9,5 +9,8 @@
         <Style TargetType="{x:Type FrameworkElement}" x:Key="Margins">
             <Setter Property="FrameworkElement.Margin" Value="3,6" />
         </Style>
+        <Style BasedOn="{StaticResource Margins}" TargetType="{x:Type Control}" x:Key="Padding">
+            <Setter Property="Control.Padding" Value="3,0" />
+        </Style>
     </Application.Resources>
 </Application>

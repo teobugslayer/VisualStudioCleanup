@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace VisualStudioCleanup
 {
@@ -14,10 +13,10 @@ namespace VisualStudioCleanup
             this.Uninstallables = new ReactiveList<Uninstallable>(OperatingSystemTasks.GetUninstallables().ToEnumerable().OrderBy(x => x.Name));
             this.SelectedUninstallables = new ReactiveList<Uninstallable>();
 
-            this.TurnOffHyperVCommand = ReactiveCommand.CreateAsyncTask(x => OperatingSystemTasks.TurnOffHyperV());
-            this.CleanSetupLogsCommand = ReactiveCommand.CreateAsyncTask(x => OperatingSystemTasks.CleanSetupLogs());
-            this.UninstallCommand = ReactiveCommand.CreateAsyncTask(this.SelectedUninstallables.CountChanged.Select(count => count != 0), x => DoUninstall());
-            this.AboutCommand = ReactiveCommand.CreateAsyncObservable(x => Observable.Return(true));
+            this.TurnOffHyperVCommand = ReactiveCommand.CreateAsyncObservable(x => OperatingSystemTasks.TurnOffHyperV());
+            this.CleanSetupLogsCommand = ReactiveCommand.CreateAsyncObservable(x => OperatingSystemTasks.CleanSetupLogs());
+            this.UninstallCommand = ReactiveCommand.CreateAsyncObservable(this.SelectedUninstallables.CountChanged.Select(count => count != 0), x => DoUninstall());
+            this.AboutCommand = ReactiveCommand.CreateAsyncObservable(x => Observable.Return(!this.ShowAbout));
             this.showAbout = this.AboutCommand.ToProperty(this, x => x.ShowAbout, false);
 
             this.isBusy = this.WhenAnyObservable(
@@ -37,18 +36,16 @@ namespace VisualStudioCleanup
         public ReactiveList<Uninstallable> Uninstallables { get; private set; }
         public ReactiveList<Uninstallable> SelectedUninstallables { get; private set; }
 
-        private Task DoUninstall()
+        private IObservable<Unit> DoUninstall()
         {
-            var result = new Task(() =>
+            return Observable.Start(() =>
             {
                 foreach (var item in this.SelectedUninstallables)
                 {
                     OperatingSystemTasks.Uninstall(item.Command);
                 }
             },
-            TaskCreationOptions.LongRunning);
-            result.Start();
-            return result;
+            RxApp.TaskpoolScheduler);
         }
 
         private ObservableAsPropertyHelper<bool> showAbout;

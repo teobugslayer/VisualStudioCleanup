@@ -27,11 +27,11 @@
         <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Height="16" Style="{StaticResource Margins}" Width="Auto" Grid.Row="2"/>
         
         <StackPanel Orientation="Horizontal" Grid.Row="3">
-            <Button Style="{StaticResource Margins}" Command="{Binding UninstallCommand}">1. Uninstall selected</Button>
-            <Button Style="{StaticResource Margins}" Command="{Binding TurnOffHyperVCommand}">2. Uninstall Hyper-V</Button>
-            <Button Style="{StaticResource Margins}" Command="{Binding CleanSetupLogsCommand}">3. Clean setup logs</Button>
-            <Button Style="{StaticResource Margins}" Command="{Binding}" IsEnabled="False">Move Package Cache</Button>
-            <Button Style="{StaticResource Margins}" Command="{Binding AboutCommand}">About</Button>
+            <Button Style="{StaticResource Padding}" Command="{Binding UninstallCommand}">1. Uninstall selected</Button>
+            <Button Style="{StaticResource Padding}" Command="{Binding TurnOffHyperVCommand}">2. Uninstall Hyper-V</Button>
+            <Button Style="{StaticResource Padding}" Command="{Binding CleanSetupLogsCommand}">3. Clean setup logs</Button>
+            <Button Style="{StaticResource Padding}" Command="{Binding}" IsEnabled="False">Move Package Cache</Button>
+            <Button Style="{StaticResource Padding}" Command="{Binding AboutCommand}">About</Button>
         </StackPanel>
     </Grid>
 </Window>

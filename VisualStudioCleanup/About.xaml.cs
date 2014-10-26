@@ -17,7 +17,7 @@ namespace VisualStudioCleanup
 
         private void GitHubClick(object sender, RoutedEventArgs e)
         {
-            using (Process.Start("http://github.com/teobugslayer")) { }
+            using (Process.Start("https://github.com/teobugslayer/VisualStudioCleanup")) { }
         }
     }
 }
