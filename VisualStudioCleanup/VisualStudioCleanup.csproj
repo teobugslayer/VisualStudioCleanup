@@ -82,6 +82,7 @@
     <Compile Include="BooleanToVisibilityConverter.cs" />
     <Compile Include="OperatingSystemTasks.cs" />
     <Compile Include="UiController.cs" />
+    <Compile Include="Uninstallable.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

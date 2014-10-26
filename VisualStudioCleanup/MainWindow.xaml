@@ -2,7 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:VisualStudioCleanup"
-        Title="Visual Studio 2012+ Setup Cleanup" Height="350" Width="525">
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        mc:Ignorable="d" d:DesignHeight="200" d:DesignWidth="300"
+        Title="Visual Studio 2012+ Setup Cleanup" Height="350" Width="550">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -10,9 +13,13 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <ListView Grid.Row="0">
-            
+
+        <ListView ItemsSource="{Binding Uninstallables}" SelectionMode="Extended" x:Name="UninstallablesList" Grid.Row="0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Product to uninstall" DisplayMemberBinding="{Binding Name}" Width="500" />
+                </GridView>
+            </ListView.View>
         </ListView>
         
         <local:About Visibility="{Binding ShowAbout, Converter={StaticResource BoolToVis}}" Grid.Row="1"/>
@@ -20,10 +27,11 @@
         <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Height="16" Style="{StaticResource Margins}" Width="Auto" Grid.Row="2"/>
         
         <StackPanel Orientation="Horizontal" Grid.Row="3">
+            <Button Style="{StaticResource Margins}" Command="{Binding UninstallCommand}">1. Uninstall selected</Button>
+            <Button Style="{StaticResource Margins}" Command="{Binding TurnOffHyperVCommand}">2. Uninstall Hyper-V</Button>
+            <Button Style="{StaticResource Margins}" Command="{Binding CleanSetupLogsCommand}">3. Clean setup logs</Button>
+            <Button Style="{StaticResource Margins}" Command="{Binding}" IsEnabled="False">Move Package Cache</Button>
             <Button Style="{StaticResource Margins}" Command="{Binding AboutCommand}">About</Button>
-            <Button Style="{StaticResource Margins}" Command="{Binding CleanSetupLogsCommand}">Clean setup logs</Button>
-            <Button Style="{StaticResource Margins}" Command="{Binding TurnOffHyperVCommand}">Uninstall Hyper-V</Button>
-            <Button Style="{StaticResource Margins}">Uninstall selected</Button>
         </StackPanel>
     </Grid>
 </Window>
