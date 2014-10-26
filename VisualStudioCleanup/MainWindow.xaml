@@ -8,12 +8,14 @@
         Title="Visual Studio 2012+ Setup Cleanup" Height="350" Width="550">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" /> <!-- List of uninstallable packages -->
+            <RowDefinition Height="Auto" /> <!-- About -->
+            <RowDefinition Height="Auto" /> <!-- Move Package Cache UI -->
+            <RowDefinition Height="Auto" /> <!-- Progress status -->
+            <RowDefinition Height="Auto" /> <!-- Commands bar -->
         </Grid.RowDefinitions>
 
+        <!-- List of uninstallable packages -->
         <ListView ItemsSource="{Binding Uninstallables}" SelectionMode="Extended" x:Name="UninstallablesList" Grid.Row="0">
             <ListView.View>
                 <GridView>
@@ -22,15 +24,23 @@
             </ListView.View>
         </ListView>
         
+        <!-- About -->
         <local:About Visibility="{Binding ShowAbout, Converter={StaticResource BoolToVis}}" Grid.Row="1"/>
-
-        <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Height="16" Style="{StaticResource Margins}" Width="Auto" Grid.Row="2"/>
         
-        <StackPanel Orientation="Horizontal" Grid.Row="3">
+        <!-- Move Package Cache UI -->
+        <local:MovePackageCache Visibility="{Binding ShowPackageCache, Converter={StaticResource BoolToVis}}" Grid.Row="2">
+            
+        </local:MovePackageCache>
+
+        <!-- Progress status -->
+        <ProgressBar IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" Height="16" Style="{StaticResource Margins}" Width="Auto" Grid.Row="3"/>
+        
+        <!-- Commands bar -->
+        <StackPanel Orientation="Horizontal" Grid.Row="4">
             <Button Style="{StaticResource Padding}" Command="{Binding UninstallCommand}">1. Uninstall selected</Button>
             <Button Style="{StaticResource Padding}" Command="{Binding TurnOffHyperVCommand}">2. Uninstall Hyper-V</Button>
             <Button Style="{StaticResource Padding}" Command="{Binding CleanSetupLogsCommand}">3. Clean setup logs</Button>
-            <Button Style="{StaticResource Padding}" Command="{Binding}" IsEnabled="False">Move Package Cache</Button>
+            <Button Style="{StaticResource Padding}" Command="{Binding ShowPackageCacheCommand}">Move Package Cache</Button>
             <Button Style="{StaticResource Padding}" Command="{Binding AboutCommand}">About</Button>
         </StackPanel>
     </Grid>

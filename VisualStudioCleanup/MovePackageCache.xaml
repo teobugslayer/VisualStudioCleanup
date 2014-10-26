@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="VisualStudioCleanup.MovePackageCache"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:local="clr-namespace:VisualStudioCleanup"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" d:DesignHeight="100" d:DesignWidth="400">
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock>Where to move the Package Folder Cache directory (will create a subfolder):</TextBlock>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+                
+            <TextBox x:Name="DestinationDir" Text="{Binding PackageCacheDestination}" Grid.Column="0" Style="{StaticResource Padding}" />
+            <Button Content="..." Click="ChooseDestinationDir" Grid.Column="1" Style="{StaticResource Padding}" />
+        </Grid>
+        <Button HorizontalAlignment="Right" Style="{StaticResource Padding}" Command="{Binding MovePackageCacheCommand}">Go</Button>
+    </StackPanel>
+</UserControl>

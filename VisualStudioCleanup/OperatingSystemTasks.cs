@@ -5,8 +5,6 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Linq;
 using Microsoft.Win32;
 
 namespace VisualStudioCleanup
@@ -40,16 +38,21 @@ namespace VisualStudioCleanup
             RxApp.TaskpoolScheduler);
         }
 
+        public static IObservable<Unit> MovePackageCache(string destinationRoot)
+        {
+            return Observable.Start(() =>
+            {
+                var dest = Path.Combine(destinationRoot, "Package Cache");
+                MoveDirectory(PackageCachePath, dest);
+                Directory.Delete(PackageCachePath);
+                CreateJunction(PackageCachePath, dest);
+            },
+            RxApp.TaskpoolScheduler);
+        }
+
         public static void Uninstall(string program)
         {
-            var psi = new ProcessStartInfo("cmd.exe", "/c " + program)
-            {
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
-            using (var proc = Process.Start(psi))
-            {
-                proc.WaitForExit();
-            }
+            ExecProg(program);
         }
 
         public static IObservable<Uninstallable> GetUninstallables()
@@ -105,6 +108,49 @@ namespace VisualStudioCleanup
                         }
                     }
                 }
+            }
+        }
+
+        private static void CreateJunction(string sourceDir, string destDir)
+        {
+            ExecProg("mklink /j \"" + sourceDir + "\" \"" + destDir + "\"");
+        }
+
+        private static void ExecProg(string program)
+        {
+            var psi = new ProcessStartInfo("cmd.exe", "/c " + program)
+            {
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            using (var proc = Process.Start(psi))
+            {
+                proc.WaitForExit();
+            }
+        }
+
+        private static void MoveDirectory(string sourceDir, string destDir)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDir);
+
+            // create target dir (we may have just recursed into it
+            if (!Directory.Exists(destDir))
+            {
+                Directory.CreateDirectory(destDir);
+            }
+
+            // Move files
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                file.MoveTo(Path.Combine(destDir, file.Name));
+            }
+
+            // Move sub-dirs
+            foreach (DirectoryInfo subdir in dir.GetDirectories())
+            {
+                string temp = Path.Combine(destDir, subdir.Name);
+                MoveDirectory(subdir.FullName, temp);
+                Directory.Delete(subdir.FullName);
             }
         }
 
