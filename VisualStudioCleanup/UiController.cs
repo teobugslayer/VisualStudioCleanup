@@ -10,12 +10,16 @@ namespace VisualStudioCleanup
     {
         public UiController()
         {
-            this.Uninstallables = new ReactiveList<Uninstallable>(OperatingSystemTasks.GetUninstallables().ToEnumerable().OrderBy(x => x.Name));
+            this.Uninstallables = new ReactiveList<Uninstallable>(this.Refresh());
             this.SelectedUninstallables = new ReactiveList<Uninstallable>();
 
             this.TurnOffHyperVCommand = ReactiveCommand.CreateAsyncObservable(x => OperatingSystemTasks.TurnOffHyperV());
             this.CleanSetupLogsCommand = ReactiveCommand.CreateAsyncObservable(x => OperatingSystemTasks.CleanSetupLogs());
             this.UninstallCommand = ReactiveCommand.CreateAsyncObservable(this.SelectedUninstallables.CountChanged.Select(count => count != 0), x => DoUninstall());
+            this.UninstallCommand.ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => {
+                this.Uninstallables.Clear();
+                this.Uninstallables.AddRange(this.Refresh());
+            });
             this.AboutCommand = ReactiveCommand.CreateAsyncObservable(x => Observable.Return(!this.ShowAbout));
             this.showAbout = this.AboutCommand.ToProperty(this, x => x.ShowAbout, false);
 
@@ -46,6 +50,11 @@ namespace VisualStudioCleanup
                 }
             },
             RxApp.TaskpoolScheduler);
+        }
+
+        private IOrderedEnumerable<Uninstallable> Refresh()
+        {
+            return OperatingSystemTasks.GetUninstallables().ToEnumerable().OrderBy(x => x.Name);
         }
 
         private ObservableAsPropertyHelper<bool> showAbout;

@@ -3,11 +3,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Linq;
 using Microsoft.Win32;
-using System.Reactive.Disposables;
 
 namespace VisualStudioCleanup
 {
@@ -30,24 +30,26 @@ namespace VisualStudioCleanup
             return Observable.Start(() =>
             {
                 var tempDir = Path.GetTempPath();
-                Directory.EnumerateFiles(tempDir, "dd_*.*").ToObservable().Subscribe(file => File.Delete(file));
-                Directory.EnumerateFiles(tempDir, "VSIXInstaller_*.log").ToObservable().Subscribe(file => File.Delete(file));
-                Directory.EnumerateFiles(tempDir, "MSI*.LOG").ToObservable().Subscribe(file => File.Delete(file));
-                Directory.EnumerateFiles(tempDir, "sql*.*").ToObservable().Subscribe(file => File.Delete(file));
+                Observable.Concat(
+                    Directory.EnumerateFiles(tempDir, "dd_*.*").ToObservable(),
+                    Directory.EnumerateFiles(tempDir, "VSIXInstaller_*.log").ToObservable(),
+                    Directory.EnumerateFiles(tempDir, "MSI*.LOG").ToObservable(),
+                    Directory.EnumerateFiles(tempDir, "sql*.*").ToObservable())
+                .Subscribe(file => File.Delete(file));
             },
             RxApp.TaskpoolScheduler);
         }
 
-        public static IObservable<Unit> Uninstall(string program)
+        public static void Uninstall(string program)
         {
-            return Observable.Start(() =>
+            var psi = new ProcessStartInfo("cmd.exe", "/c " + program)
             {
-                using (var proc = Process.Start("cmd.exe", "/c " + program))
-                {
-                    proc.WaitForExit();
-                }
-            },
-            RxApp.TaskpoolScheduler);
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            using (var proc = Process.Start(psi))
+            {
+                proc.WaitForExit();
+            }
         }
 
         public static IObservable<Uninstallable> GetUninstallables()
