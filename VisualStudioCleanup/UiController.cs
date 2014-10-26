@@ -44,7 +44,7 @@ namespace VisualStudioCleanup
         {
             return Observable.Start(() =>
             {
-                foreach (var item in this.SelectedUninstallables)
+                foreach (var item in this.SelectedUninstallables.ToArray())
                 {
                     OperatingSystemTasks.Uninstall(item.Command);
                 }
