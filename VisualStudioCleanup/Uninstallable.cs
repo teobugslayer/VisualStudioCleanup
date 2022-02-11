@@ -8,7 +8,7 @@
             this.Command = command;
         }
 
-        public string Name { get; private set; }
-        public string Command { get; private set; }
+        public string Name { get; }
+        public string Command { get; }
     }
 }

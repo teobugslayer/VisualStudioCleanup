@@ -17,7 +17,7 @@ namespace VisualStudioCleanup
             {
                 using (var dism = Process.Start("dism.exe", "/Online /Disable-Feature:Microsoft-Hyper-V-All"))
                 {
-                    dism.WaitForExit();
+                    dism?.WaitForExit();
                 }
             },
             RxApp.TaskpoolScheduler);
@@ -91,12 +91,14 @@ namespace VisualStudioCleanup
         {
             using (var uninstallKey = baseKey.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall"))
             {
+                if (uninstallKey == null) return;
                 var subKeys = uninstallKey.GetSubKeyNames();
 
                 foreach(var subkeyName in subKeys)
                 {
                     using (var subkey = uninstallKey.OpenSubKey(subkeyName))
                     {
+                        if (subkey == null) continue;
                         var name = (string)subkey.GetValue("DisplayName");
                         var command = (string)subkey.GetValue("UninstallString");
                         var source = (string)subkey.GetValue("InstallSource", "");
@@ -113,25 +115,25 @@ namespace VisualStudioCleanup
 
         private static void CreateJunction(string sourceDir, string destDir)
         {
-            ExecProg("mklink /j \"" + sourceDir + "\" \"" + destDir + "\"");
+            ExecProg($"mklink /j \"{sourceDir}\" \"{destDir}\"");
         }
 
         private static void ExecProg(string program)
         {
-            var psi = new ProcessStartInfo("cmd.exe", "/c " + program)
+            var psi = new ProcessStartInfo("cmd.exe", $"/c {program}")
             {
                 WindowStyle = ProcessWindowStyle.Hidden
             };
             using (var proc = Process.Start(psi))
             {
-                proc.WaitForExit();
+                proc?.WaitForExit();
             }
         }
 
         private static void MoveDirectory(string sourceDir, string destDir)
         {
             // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDir);
+            var dir = new DirectoryInfo(sourceDir);
 
             // create target dir (we may have just recursed into it
             if (!Directory.Exists(destDir))
@@ -140,20 +142,22 @@ namespace VisualStudioCleanup
             }
 
             // Move files
-            foreach (FileInfo file in dir.GetFiles())
+            foreach (var file in dir.GetFiles())
             {
                 file.MoveTo(Path.Combine(destDir, file.Name));
             }
 
             // Move sub-dirs
-            foreach (DirectoryInfo subdir in dir.GetDirectories())
+            foreach (var subdir in dir.GetDirectories())
             {
-                string temp = Path.Combine(destDir, subdir.Name);
+                var temp = Path.Combine(destDir, subdir.Name);
                 MoveDirectory(subdir.FullName, temp);
                 Directory.Delete(subdir.FullName);
             }
         }
 
-        private static string PackageCachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Package Cache");
+        private static readonly string PackageCachePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), 
+            "Package Cache");
     }
 }

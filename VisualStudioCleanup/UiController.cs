@@ -34,22 +34,22 @@ namespace VisualStudioCleanup
                 .ToProperty(this, x => x.IsBusy);
         }
 
-        public ReactiveCommand<bool> AboutCommand { get; private set; }
-        public ReactiveCommand<Unit> TurnOffHyperVCommand { get; private set; }
-        public ReactiveCommand<Unit> CleanSetupLogsCommand { get; private set; }
-        public ReactiveCommand<Unit> UninstallCommand { get; private set; }
-        public ReactiveCommand<Unit> MovePackageCacheCommand { get; private set; }
-        public ReactiveCommand<bool> ShowPackageCacheCommand { get; private set; }
+        public ReactiveCommand<bool> AboutCommand { get; }
+        public ReactiveCommand<Unit> TurnOffHyperVCommand { get; }
+        public ReactiveCommand<Unit> CleanSetupLogsCommand { get; }
+        public ReactiveCommand<Unit> UninstallCommand { get; }
+        public ReactiveCommand<Unit> MovePackageCacheCommand { get; }
+        public ReactiveCommand<bool> ShowPackageCacheCommand { get; }
 
-        public bool ShowAbout { get { return this.showAbout.Value; } }
-        public bool IsBusy { get { return this.isBusy.Value; } }
-        public bool ShowPackageCache { get { return this.showPackageCache.Value; } }
-        public ReactiveList<Uninstallable> Uninstallables { get; private set; }
-        public ReactiveList<Uninstallable> SelectedUninstallables { get; private set; }
+        public bool ShowAbout => this.showAbout.Value;
+        public bool IsBusy => this.isBusy.Value;
+        public bool ShowPackageCache => this.showPackageCache.Value;
+        public ReactiveList<Uninstallable> Uninstallables { get; }
+        public ReactiveList<Uninstallable> SelectedUninstallables { get; }
         public string PackageCacheDestination
         {
-            get { return this.packageCacheDestination; }
-            set { this.RaiseAndSetIfChanged(ref this.packageCacheDestination, value); }
+            get => this.packageCacheDestination;
+            set => this.RaiseAndSetIfChanged(ref this.packageCacheDestination, value);
         }
 
         private IObservable<Unit> DoUninstall()
@@ -69,9 +69,9 @@ namespace VisualStudioCleanup
             return OperatingSystemTasks.GetUninstallables().ToEnumerable().OrderBy(x => x.Name);
         }
 
-        private ObservableAsPropertyHelper<bool> showAbout;
-        private ObservableAsPropertyHelper<bool> isBusy;
-        private ObservableAsPropertyHelper<bool> showPackageCache;
+        private readonly ObservableAsPropertyHelper<bool> showAbout;
+        private readonly ObservableAsPropertyHelper<bool> isBusy;
+        private readonly ObservableAsPropertyHelper<bool> showPackageCache;
         private string packageCacheDestination;
     }
 }

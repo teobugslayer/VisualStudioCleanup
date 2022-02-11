@@ -22,12 +22,11 @@ namespace VisualStudioCleanup
             // Yes. I am wasting time complaining about this. Yes, I hate this code passionately
             this.UninstallablesList.SelectionChanged += (object sender, SelectionChangedEventArgs e) => 
             {
-                var controller = this.DataContext as UiController;
-                if (controller != null)
+                if (this.DataContext is UiController controller)
                 {
                     using (controller.SelectedUninstallables.SuppressChangeNotifications())
                     {
-                        foreach(var item in e.RemovedItems.Cast<Uninstallable>())
+                        foreach(Uninstallable item in e.RemovedItems)
                         {
                             controller.SelectedUninstallables.Remove(item);
                         }
